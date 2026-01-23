@@ -3,9 +3,9 @@ import {FullPage, MainLayout} from "@/shared/ui/layouts";
 
 const routes = [
   {
-    path: '/company',
-    name: 'company',
-    component: () => import('@/pages/company'),
+    path: '/companies',
+    name: 'companies',
+    component: () => import('@/modules/pages/company'),
     meta: {
       layout: MainLayout
     }
@@ -13,19 +13,19 @@ const routes = [
   {
     path: '/accounts',
     name: 'accounts',
-    component: () => import('@/pages/accounts'),
+    component: () => import('@/modules/pages/accounts'),
     meta: {
       layout: MainLayout
     }
   },
   {
     path: '/',
-    redirect: '/company',
+    redirect: '/companies',
   },
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/pages/login'),
+    component: () => import('@/modules/pages/login'),
     meta: {
       layout: FullPage
     }
@@ -33,7 +33,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.VITE_BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
 

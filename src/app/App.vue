@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TheHeader } from '@/widgets'
+import { TheHeader } from '@/shared/ui/components'
 import { useRoute} from 'vue-router';
 import { computed } from 'vue';
 import {FullPage} from "@/shared/ui/layouts";

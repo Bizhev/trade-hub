@@ -1,1 +1,1 @@
-export * from './htppClient'
+export * from './httpClient'
