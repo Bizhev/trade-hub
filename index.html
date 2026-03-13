@@ -4,7 +4,20 @@
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
+    <title>trade-hub — Investor Platform</title>
+    <!--
+      SPA on GitHub Pages: 404.html saves the intended URL to sessionStorage,
+      this script restores it so Vue Router can handle the correct route.
+    -->
+    <script>
+      (function () {
+        var redirect = sessionStorage.getItem('spa-redirect')
+        if (redirect) {
+          sessionStorage.removeItem('spa-redirect')
+          history.replaceState(null, '', redirect)
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="app"></div>

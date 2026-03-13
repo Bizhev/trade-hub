@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>trade-hub</title>
+    <!--
+      GitHub Pages SPA redirect.
+      When GitHub Pages returns a 404 for a client-side route (e.g. /trade-hub/companies),
+      this page saves the full intended URL to sessionStorage and redirects to the app root.
+      index.html then restores the URL so Vue Router can mount on the correct route.
+    -->
+    <script>
+      sessionStorage.setItem('spa-redirect', window.location.href)
+      window.location.replace(
+        window.location.protocol + '//' +
+        window.location.hostname +
+        (window.location.port ? ':' + window.location.port : '') +
+        '/trade-hub/'
+      )
+    </script>
+  </head>
+  <body></body>
+</html>

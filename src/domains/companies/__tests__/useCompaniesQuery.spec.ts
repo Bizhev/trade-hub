@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, type Ref } from 'vue'
 import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
 
 /**
@@ -31,7 +31,7 @@ function makeQueryClient() {
  * Mounts a headless component that calls the composable.
  * Returns the reactive result and the QueryClient for direct assertions.
  */
-function mountQuery(searchQuery?: ReturnType<typeof ref<string>>) {
+function mountQuery(searchQuery?: Ref<string>) {
   const queryClient = makeQueryClient()
   let result!: ReturnType<typeof useCompaniesQuery>
 

@@ -10,7 +10,7 @@
 [![Vitest](https://img.shields.io/badge/Vitest-1.6-6e9f18?logo=vitest&logoColor=white)](https://vitest.dev/)
 [![Cypress](https://img.shields.io/badge/Cypress-13-17202C?logo=cypress&logoColor=white)](https://www.cypress.io/)
 
-**[🚀 Live Demo](#)** · **[Архитектура](#архитектура)** · **[Тесты](#тесты)**
+**[🚀 Live Demo](https://bizhev.github.io/trade-hub/)** · **[Архитектура](#архитектура)** · **[Тесты](#тесты)**
 
 ---
 
