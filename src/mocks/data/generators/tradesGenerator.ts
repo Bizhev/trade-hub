@@ -5,7 +5,6 @@ import dayjs from 'dayjs'
 
 const TRADE_TYPES: TradeType[] = ['market', 'limit', 'stop', 'stop-limit']
 const TRADE_SIDES: TradeSide[] = ['buy', 'sell']
-const TRADE_STATUSES: TradeStatus[] = ['executed', 'pending', 'cancelled']
 
 export function generateTrade(
   id: number,
