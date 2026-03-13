@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
-import { instrumentsService } from '../InstrumentsService'
+import { container, TOKENS } from '@/shared/config/container'
+import type { InstrumentsService } from '../InstrumentsService'
 import type {
   IInstrument,
   IStock,
@@ -8,6 +9,8 @@ import type {
   InstrumentType,
   IInstrumentFilters
 } from '../types'
+
+const instrumentsService = container.get<InstrumentsService>(TOKENS.InstrumentsService)
 
 export function useInstruments() {
   const instruments = ref<IInstrument[]>([])

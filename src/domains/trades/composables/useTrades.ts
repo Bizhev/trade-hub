@@ -1,6 +1,9 @@
 import { ref, computed } from 'vue'
-import { tradesService } from '../TradesService'
+import { container, TOKENS } from '@/shared/config/container'
+import type { TradesService } from '../TradesService'
 import type { ITrade, ICreateTradeRequest, ITradeFilters, ITradeStats } from '../types'
+
+const tradesService = container.get<TradesService>(TOKENS.TradesService)
 
 export function useTrades() {
   const trades = ref<ITrade[]>([])

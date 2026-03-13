@@ -1,6 +1,9 @@
 import { ref, computed } from 'vue'
-import { companiesService } from '../CompaniesService'
+import { container, TOKENS } from '@/shared/config/container'
+import type { CompaniesService } from '../CompaniesService'
 import type { ICompany, ICompanyFilters } from '../types'
+
+const companiesService = container.get<CompaniesService>(TOKENS.CompaniesService)
 
 export function useCompanies() {
   const companies = ref<ICompany[]>([])

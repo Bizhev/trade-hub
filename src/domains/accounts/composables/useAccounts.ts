@@ -1,6 +1,9 @@
 import { ref, computed } from 'vue'
-import { accountsService } from '../AccountsService'
+import { container, TOKENS } from '@/shared/config/container'
+import type { AccountsService } from '../AccountsService'
 import type { IAccount, IUser, ILoginRequest } from '../types'
+
+const accountsService = container.get<AccountsService>(TOKENS.AccountsService)
 
 export function useAccounts() {
   const accounts = ref<IAccount[]>([])

@@ -1,6 +1,9 @@
 import { ref, computed } from 'vue'
-import { portfolioService } from '../PortfolioService'
+import { container, TOKENS } from '@/shared/config/container'
+import type { PortfolioService } from '../PortfolioService'
 import type { IPortfolio, IPosition, IPortfolioSummary } from '../types'
+
+const portfolioService = container.get<PortfolioService>(TOKENS.PortfolioService)
 
 export function usePortfolio() {
   const portfolio = ref<IPortfolio | null>(null)
