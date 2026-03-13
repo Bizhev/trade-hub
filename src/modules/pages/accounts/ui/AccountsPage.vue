@@ -5,9 +5,9 @@
     </div>
 
     <q-table
-      :rows="accounts"
+      :rows="accounts ?? []"
       :columns="columns"
-      :loading="loading"
+      :loading="isLoading"
       row-key="id"
       flat
       bordered
@@ -43,11 +43,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
 import type { QTableColumn } from 'quasar'
-import { useAccounts } from '@/domains/accounts/composables/useAccounts'
+import { useAccountsQuery } from '@/domains/accounts/composables/useAccountsQuery'
 
-const { accounts, loading, fetchAccounts } = useAccounts()
+const { accounts, isLoading } = useAccountsQuery()
 
 const columns: QTableColumn[] = [
   {
@@ -111,7 +110,5 @@ function formatCurrency(value: number, currency: string): string {
   }).format(value)
 }
 
-onMounted(async () => {
-  await fetchAccounts()
-})
+// No manual fetch needed — useAccountsQuery fetches automatically when authenticated.
 </script>

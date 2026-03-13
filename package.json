@@ -19,6 +19,7 @@
   "dependencies": {
     "@faker-js/faker": "^9.3.0",
     "@quasar/extras": "^1.16.12",
+    "@tanstack/vue-query": "^5.92.9",
     "axios": "^1.7.3",
     "dayjs": "^1.11.12",
     "inversify": "^6.0.2",

@@ -8,7 +8,6 @@
         outlined
         dense
         placeholder="Search companies by name or ticker..."
-        @update:model-value="onSearch"
       >
         <template v-slot:prepend>
           <q-icon name="search" />
@@ -17,9 +16,9 @@
     </div>
 
     <q-table
-      :rows="companies"
+      :rows="companies ?? []"
       :columns="columns"
-      :loading="loading"
+      :loading="isLoading"
       row-key="id"
       flat
       bordered
@@ -59,13 +58,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import type { QTableColumn } from 'quasar'
-import { useCompanies } from '@/domains/companies/composables/useCompanies'
-
-const { companies, loading, fetchCompanies, searchCompanies } = useCompanies()
+import { useCompaniesQuery } from '@/domains/companies/composables/useCompaniesQuery'
 
 const searchQuery = ref('')
+const { companies, isLoading } = useCompaniesQuery(searchQuery)
 
 const columns: QTableColumn[] = [
   {
@@ -131,15 +129,5 @@ function formatCurrency(value: number): string {
   return `$${value.toLocaleString()}`
 }
 
-async function onSearch() {
-  if (searchQuery.value.trim()) {
-    await searchCompanies(searchQuery.value)
-  } else {
-    await fetchCompanies()
-  }
-}
-
-onMounted(async () => {
-  await fetchCompanies()
-})
+// No manual fetch needed — useCompaniesQuery reacts to searchQuery changes automatically.
 </script>
