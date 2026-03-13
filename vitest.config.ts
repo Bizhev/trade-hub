@@ -12,6 +12,13 @@ export default mergeConfig(
       coverage: {
         provider: 'v8',
         reporter: ['text', 'lcov'],
+        // Measure only the business-logic layer (services + TanStack Query composables).
+        // Vue components, layouts, and legacy composables are covered by Cypress E2E —
+        // excluding them prevents inflating the denominator with untestable UI code.
+        include: [
+          'src/domains/**/*Service.ts',
+          'src/domains/**/*Query.ts',
+        ],
         exclude: ['src/mocks/**', 'src/shared/config/dts/**'],
         thresholds: { lines: 60, functions: 60, branches: 60, statements: 60 }
       }
