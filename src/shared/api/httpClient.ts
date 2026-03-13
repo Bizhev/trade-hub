@@ -1,44 +1,26 @@
-import axios, { type AxiosInstance } from 'axios'
+import axios, { type AxiosInstance, type AxiosResponse, type AxiosRequestConfig } from 'axios'
 import { environment } from '../config/environment'
 import { mockApiClient } from '@/mocks/api/mockApiClient'
 
-/**
- * Создание реального API клиента
- */
+function mockResponse<T>(data: T, config?: AxiosRequestConfig): AxiosResponse<T> {
+  return { data, status: 200, statusText: 'OK', headers: {}, config: (config ?? {}) as AxiosResponse['config'] }
+}
+
 function createRealApiClient(): AxiosInstance {
-  console.log('[HTTP Client] Using Real API')
+  const apiClient = axios.create({ baseURL: environment.apiBaseUrl })
 
-  const apiClient = axios.create({
-    baseURL: environment.apiBaseUrl
-  })
-
-  // Восстановить токен из localStorage
   const token = localStorage.getItem('bear')
   if (token) {
     apiClient.defaults.headers.common.Authorization = token
   }
 
-  // Перехватчик ответов
   apiClient.interceptors.response.use(
     (response) => response,
-    (error) => {
-      const res = error.response
-      console.warn('[HTTP Client] Error:', res)
-
-      if (res) {
-        switch (res.status) {
-          case 401:
-            // Неавторизован - перенаправить на логин
-            window.location.href = '/login'
-            break
-          case 404:
-            // Не найдено
-            break
-          default:
-            console.warn('[HTTP Client] Unhandled error status:', res.status)
-        }
+    (error: unknown) => {
+      const res = (error as { response?: { status: number } }).response
+      if (res?.status === 401) {
+        window.location.href = '/login'
       }
-
       return Promise.reject(error)
     }
   )
@@ -46,140 +28,92 @@ function createRealApiClient(): AxiosInstance {
   return apiClient
 }
 
-/**
- * Создание мок API клиента
- */
 function createMockApiClient(): AxiosInstance {
-  console.log('[HTTP Client] Using Mock API')
-
-  // Создаем фальшивый axios instance
   const mockAxios = axios.create()
 
-  // Перехватываем GET запросы
-  mockAxios.get = async (url: string, config?: any) => {
-    const path = new URL(url, 'http://localhost').pathname
-    let data: any
+  type InstrumentType = 'stock' | 'etf' | 'bond'
 
-    // Auth
+  const handleGet = async (url: string, config?: AxiosRequestConfig): Promise<AxiosResponse> => {
+    const path = new URL(url, 'http://localhost').pathname
+    const params = config?.params as Record<string, string> | undefined
+    let data: unknown
+
     if (path === '/api/user/me') {
       data = await mockApiClient.getCurrentUser()
-    }
-    // Companies
-    else if (path === '/api/companies') {
+    } else if (path === '/api/companies') {
       data = await mockApiClient.getCompanies()
     } else if (path.match(/\/api\/companies\/\d+$/)) {
-      const id = parseInt(path.split('/').pop()!)
-      data = await mockApiClient.getCompanyById(id)
+      data = await mockApiClient.getCompanyById(parseInt(path.split('/').pop()!))
     } else if (path.includes('/api/companies/ticker/')) {
-      const ticker = path.split('/ticker/')[1]
-      data = await mockApiClient.getCompanyByTicker(ticker)
+      data = await mockApiClient.getCompanyByTicker(path.split('/ticker/')[1])
     } else if (path === '/api/companies/search') {
-      const query = config?.params?.q || ''
-      data = await mockApiClient.searchCompanies(query)
-    }
-    // Instruments
-    else if (path === '/api/instruments') {
-      const type = config?.params?.type
-      const companyId = config?.params?.companyId
-      if (companyId) {
-        data = await mockApiClient.getInstrumentsByCompany(companyId)
-      } else {
-        data = await mockApiClient.getInstruments(type)
-      }
+      data = await mockApiClient.searchCompanies(params?.q ?? '')
+    } else if (path === '/api/instruments') {
+      const type = params?.type as InstrumentType | undefined
+      data = params?.companyId
+        ? await mockApiClient.getInstrumentsByCompany(parseInt(params.companyId))
+        : await mockApiClient.getInstruments(type)
     } else if (path.match(/\/api\/instruments\/\d+$/)) {
-      const id = parseInt(path.split('/').pop()!)
-      data = await mockApiClient.getInstrumentById(id)
+      data = await mockApiClient.getInstrumentById(parseInt(path.split('/').pop()!))
     } else if (path.includes('/api/instruments/ticker/')) {
-      const ticker = path.split('/ticker/')[1]
-      data = await mockApiClient.getInstrumentByTicker(ticker)
+      data = await mockApiClient.getInstrumentByTicker(path.split('/ticker/')[1])
     } else if (path === '/api/instruments/search') {
-      const query = config?.params?.q || ''
-      const type = config?.params?.type
-      data = await mockApiClient.searchInstruments(query, type)
-    }
-    // Accounts
-    else if (path === '/api/user/accounts') {
+      const type = params?.type as InstrumentType | undefined
+      data = await mockApiClient.searchInstruments(params?.q ?? '', type)
+    } else if (path === '/api/user/accounts') {
       data = await mockApiClient.getAccounts()
     } else if (path.match(/\/api\/user\/accounts\/\d+$/)) {
-      const id = parseInt(path.split('/').pop()!)
-      data = await mockApiClient.getAccountById(id)
-    }
-    // Portfolio
-    else if (path.match(/\/api\/portfolio\/\d+$/)) {
-      const accountId = parseInt(path.split('/').pop()!)
-      data = await mockApiClient.getPortfolio(accountId)
+      data = await mockApiClient.getAccountById(parseInt(path.split('/').pop()!))
+    } else if (path.match(/\/api\/portfolio\/\d+$/)) {
+      data = await mockApiClient.getPortfolio(parseInt(path.split('/').pop()!))
     } else if (path.match(/\/api\/portfolio\/\d+\/positions$/)) {
-      const accountId = parseInt(path.split('/')[3])
-      data = await mockApiClient.getPositions(accountId)
-    }
-    // Trades
-    else if (path === '/api/trades') {
-      const accountId = config?.params?.accountId
-      data = await mockApiClient.getTrades(accountId)
+      data = await mockApiClient.getPositions(parseInt(path.split('/')[3]))
+    } else if (path === '/api/trades') {
+      data = await mockApiClient.getTrades(params?.accountId ? parseInt(params.accountId) : undefined)
     } else if (path.match(/\/api\/trades\/\d+$/)) {
-      const id = parseInt(path.split('/').pop()!)
-      data = await mockApiClient.getTradeById(id)
+      data = await mockApiClient.getTradeById(parseInt(path.split('/').pop()!))
     } else {
-      throw new Error(`Mock API: Unknown route ${path}`)
+      throw new Error(`Mock API: Unknown GET route ${path}`)
     }
 
-    return {
-      data,
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config: config || {}
-    }
+    return mockResponse(data, config)
   }
 
-  // Перехватываем POST запросы
-  mockAxios.post = async (url: string, body?: any, config?: any) => {
+  mockAxios.get = handleGet as typeof mockAxios.get
+
+  const handlePost = async (url: string, body?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse> => {
     const path = new URL(url, 'http://localhost').pathname
-    let data: any
+    let data: unknown
 
     if (path === '/api/auth/login') {
-      data = await mockApiClient.login(body)
+      data = await mockApiClient.login(body as Parameters<typeof mockApiClient.login>[0])
     } else if (path === '/api/trades') {
-      data = await mockApiClient.createTrade(body)
+      data = await mockApiClient.createTrade(body as Parameters<typeof mockApiClient.createTrade>[0])
     } else {
       throw new Error(`Mock API: Unknown POST route ${path}`)
     }
 
-    return {
-      data,
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config: config || {}
-    }
+    return mockResponse(data, config)
   }
 
-  // Перехватываем DELETE запросы
-  mockAxios.delete = async (url: string, config?: any) => {
+  mockAxios.post = handlePost as typeof mockAxios.post
+
+  const handleDelete = async (url: string, config?: AxiosRequestConfig): Promise<AxiosResponse> => {
     const path = new URL(url, 'http://localhost').pathname
-    let data: any
+    let data: unknown
 
     if (path.match(/\/api\/trades\/\d+$/)) {
-      const id = parseInt(path.split('/').pop()!)
-      data = await mockApiClient.cancelTrade(id)
+      data = await mockApiClient.cancelTrade(parseInt(path.split('/').pop()!))
     } else {
       throw new Error(`Mock API: Unknown DELETE route ${path}`)
     }
 
-    return {
-      data,
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config: config || {}
-    }
+    return mockResponse(data, config)
   }
 
-  return mockAxios as AxiosInstance
+  mockAxios.delete = handleDelete as typeof mockAxios.delete
+
+  return mockAxios
 }
 
-/**
- * API Client
- * Автоматически выбирает между real и mock API на основе environment
- */
 export const api = environment.useMockApi ? createMockApiClient() : createRealApiClient()

@@ -60,13 +60,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import type { QTableColumn } from 'quasar'
 import { useCompanies } from '@/domains/companies/composables/useCompanies'
 
 const { companies, loading, fetchCompanies, searchCompanies } = useCompanies()
 
 const searchQuery = ref('')
 
-const columns = [
+const columns: QTableColumn[] = [
   {
     name: 'ticker',
     label: 'Ticker',

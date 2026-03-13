@@ -1,9 +1,8 @@
 import { mockStorage } from '../data/storage/mockStorage'
-import type { ILoginRequest, ILoginResponse } from '@/domains/accounts/types'
+import type { ILoginRequest, ILoginResponse, IAccount, IUser } from '@/domains/accounts/types'
 import type { ICreateTradeRequest } from '@/domains/trades/types'
 import type { ICompany } from '@/domains/companies/types'
 import type { IInstrument } from '@/domains/instruments/types'
-import type { IAccount } from '@/domains/accounts/types'
 import type { IPortfolio } from '@/domains/portfolio/types'
 import type { ITrade } from '@/domains/trades/types'
 
@@ -21,7 +20,6 @@ export const mockApiClient = {
   // ============ Auth ============
 
   async login(credentials: ILoginRequest): Promise<ILoginResponse> {
-    console.log('[MockAPI] POST /api/auth/login')
     await delay(500)
 
     const user = mockStorage.getUser()
@@ -44,13 +42,11 @@ export const mockApiClient = {
   // ============ Companies ============
 
   async getCompanies(): Promise<ICompany[]> {
-    console.log('[MockAPI] GET /api/companies')
     await delay()
     return mockStorage.getCompanies()
   },
 
   async getCompanyById(id: number): Promise<ICompany> {
-    console.log(`[MockAPI] GET /api/companies/${id}`)
     await delay()
     const company = mockStorage.getCompanyById(id)
     if (!company) {
@@ -60,7 +56,6 @@ export const mockApiClient = {
   },
 
   async getCompanyByTicker(ticker: string): Promise<ICompany> {
-    console.log(`[MockAPI] GET /api/companies/ticker/${ticker}`)
     await delay()
     const company = mockStorage.getCompanyByTicker(ticker)
     if (!company) {
@@ -70,7 +65,6 @@ export const mockApiClient = {
   },
 
   async searchCompanies(query: string): Promise<ICompany[]> {
-    console.log(`[MockAPI] GET /api/companies/search?q=${query}`)
     await delay()
     return mockStorage.searchCompanies(query)
   },
@@ -78,7 +72,6 @@ export const mockApiClient = {
   // ============ Instruments ============
 
   async getInstruments(type?: 'stock' | 'etf' | 'bond'): Promise<IInstrument[]> {
-    console.log(`[MockAPI] GET /api/instruments${type ? `?type=${type}` : ''}`)
     await delay()
     if (type) {
       return mockStorage.getInstrumentsByType(type)
@@ -87,7 +80,6 @@ export const mockApiClient = {
   },
 
   async getInstrumentById(id: number): Promise<IInstrument> {
-    console.log(`[MockAPI] GET /api/instruments/${id}`)
     await delay()
     const instrument = mockStorage.getInstrumentById(id)
     if (!instrument) {
@@ -97,7 +89,6 @@ export const mockApiClient = {
   },
 
   async getInstrumentByTicker(ticker: string): Promise<IInstrument> {
-    console.log(`[MockAPI] GET /api/instruments/ticker/${ticker}`)
     await delay()
     const instrument = mockStorage.getInstrumentByTicker(ticker)
     if (!instrument) {
@@ -107,13 +98,11 @@ export const mockApiClient = {
   },
 
   async getInstrumentsByCompany(companyId: number): Promise<IInstrument[]> {
-    console.log(`[MockAPI] GET /api/instruments?companyId=${companyId}`)
     await delay()
     return mockStorage.getInstrumentsByCompany(companyId)
   },
 
   async searchInstruments(query: string, type?: 'stock' | 'etf' | 'bond'): Promise<IInstrument[]> {
-    console.log(`[MockAPI] GET /api/instruments/search?q=${query}${type ? `&type=${type}` : ''}`)
     await delay()
     const results = mockStorage.searchInstruments(query)
     if (type) {
@@ -124,24 +113,21 @@ export const mockApiClient = {
 
   // ============ Accounts ============
 
-  async getCurrentUser(): Promise<IAccount> {
-    console.log('[MockAPI] GET /api/user/me')
+  async getCurrentUser(): Promise<IUser> {
     await delay()
     const user = mockStorage.getUser()
     if (!user) {
       throw new Error('User not authenticated')
     }
-    return user as any
+    return user
   },
 
   async getAccounts(): Promise<IAccount[]> {
-    console.log('[MockAPI] GET /api/user/accounts')
     await delay()
     return mockStorage.getAccounts()
   },
 
   async getAccountById(id: number): Promise<IAccount> {
-    console.log(`[MockAPI] GET /api/user/accounts/${id}`)
     await delay()
     const account = mockStorage.getAccountById(id)
     if (!account) {
@@ -153,7 +139,6 @@ export const mockApiClient = {
   // ============ Portfolio ============
 
   async getPortfolio(accountId: number): Promise<IPortfolio> {
-    console.log(`[MockAPI] GET /api/portfolio/${accountId}`)
     await delay()
     const portfolio = mockStorage.getPortfolio(accountId)
     if (!portfolio) {
@@ -163,7 +148,6 @@ export const mockApiClient = {
   },
 
   async getPositions(accountId: number): Promise<IPortfolio['positions']> {
-    console.log(`[MockAPI] GET /api/portfolio/${accountId}/positions`)
     await delay()
     const portfolio = mockStorage.getPortfolio(accountId)
     if (!portfolio) {
@@ -175,7 +159,6 @@ export const mockApiClient = {
   // ============ Trades ============
 
   async getTrades(accountId?: number): Promise<ITrade[]> {
-    console.log(`[MockAPI] GET /api/trades${accountId ? `?accountId=${accountId}` : ''}`)
     await delay()
     if (accountId) {
       return mockStorage.getTradesByAccount(accountId)
@@ -184,7 +167,6 @@ export const mockApiClient = {
   },
 
   async getTradeById(id: number): Promise<ITrade> {
-    console.log(`[MockAPI] GET /api/trades/${id}`)
     await delay()
     const trade = mockStorage.getTradeById(id)
     if (!trade) {
@@ -194,7 +176,6 @@ export const mockApiClient = {
   },
 
   async createTrade(request: ICreateTradeRequest): Promise<ITrade> {
-    console.log('[MockAPI] POST /api/trades', request)
     await delay(500)
 
     // Validation
@@ -234,7 +215,6 @@ export const mockApiClient = {
   },
 
   async cancelTrade(id: number): Promise<ITrade> {
-    console.log(`[MockAPI] DELETE /api/trades/${id}`)
     await delay(300)
 
     const trade = mockStorage.getTradeById(id)

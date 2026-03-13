@@ -44,11 +44,12 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import type { QTableColumn } from 'quasar'
 import { useAccounts } from '@/domains/accounts/composables/useAccounts'
 
 const { accounts, loading, fetchAccounts } = useAccounts()
 
-const columns = [
+const columns: QTableColumn[] = [
   {
     name: 'accountNumber',
     label: 'Account Number',
